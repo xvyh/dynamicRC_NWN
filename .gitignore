@@ -1,0 +1,3 @@
+*.png
+*.pkl
+__pycache__/*
