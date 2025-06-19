@@ -1,0 +1,6 @@
+# For the neuromorphic simulation, only external packaged needed is Numpy
+numpy==1.21.2
+# Tqdm is a quality-of-life addition for progress bars
+tqdm==4.48.0
+# The following is only needed for figure plotting
+matplotlib==3.3.0

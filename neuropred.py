@@ -336,29 +336,50 @@ def run(
     nonlin_meas:bool=False,
     ) -> dict:
     """
-    Runs a neuromorphic prediction experiment.
+    Runs a neuromorphic prediction simulation - autonomous forecast of a time series.
 
     Parameters:
-        input_signal (np.ndarray): The input signal for the experiment.
-                        (int):  If int instead, it serves as the Lorenz signal
-                                initialisation ID
-        teacher_signal (np.ndarray): The teacher signal for the experiment.
-                                    Usually same as input signal
-        t_warmup (int): The number of warmup timesteps.
-        t_train (int): The number of training timesteps.
-        t_pred (int): The number of prediction timesteps.
-        lag (int): The number of steps ahead for prediction.
-        neuro_params (dict, optional): A dictionary of neuromorphic parameters. 
-                Includes e.g. all the electrodes, nwn params, 
-                number of nodes, Win, Win_bias. Defaults to None.
-        ridge_coeff (float, optional): The coefficient for ridge regression. 
-                Defaults to 1e-6.
-        exp_index (int, optional): The index of the experiment. Defaults to 0.
+        input_signal    (np.ndarray):   The input signal for the experiment.
+                        (int):          If int instead, it serves as the
+                                        Lorenz signal initialisation ID.
+        teacher_signal  (np.ndarray):   The teacher signal for the experiment.
+                                        Defaults to be same as input signal.
+        t_warmup        (int):          The number of warmup timesteps.
+        t_train         (int):          The number of training timesteps.
+        t_pred          (int):          The number of prediction timesteps.
+        input_electrodes (list):        List of input electrode indices. 
+                        (str):  'random'    - random allocation.
+        output_electrodes (list):       List of readout electrode indices.
+                        (str):  'all'       - all nodes are readouts.
+                                'other'     - all nodes other than input 
+                                                and drain are readouts.
+                                'other-'    - some nodes other than input 
+                                                and drain are readouts. 
+                                                Restricted by n_readout.
+                                'other+'    - all nodes other than input 
+                                                and drain are readouts, 
+                                                plus some input nodes as readouts. 
+                                                Restricted by n_readout.
+        drain_electrodes (list):        Drain electrodes (i.e. input signal of 0). 
+        n_input         (int):          Number of input nodes. 
+                                        Must match length of input_electrodes.
+        n_readout       (int):          Number of readout nodes.
+                                        Must satisfy n_readout + n_input < n_total
+        n_total         (int):          Total number of nodes. 
+                                        Must match adjacency matrix size.
+        lag             (int):          Number of steps ahead prediction.
+        neuro_params    (dict):         A dictionary of neuromorphic parameters. 
+        ridge_coeff     (float):        The coefficient for ridge regression. 
+                                        Defaults to 1e-6.
+        exp_index       (int):          The index of the experiment, determines the RNG seed. 
+        return_flux     (bool):         Whether to return flux values to output. Very RAM intensive.
+        dynamic_meas    (bool):         Whether to return dynamic measure values.
+        nonlin_meas     (bool):         Whether to return nonlinearity measure values.
 
     Returns:
-        dict: A dictionary containing the results of the experiment, 
-                including the readouts, the weight matrix W,
-                and the predicted readouts if prediction duration is not zero.
+        save_data (dict):   A dictionary containing the results of the experiment, 
+                            including the readouts, the weight matrix W,
+                            and the predicted readouts if prediction duration is not zero.
     """
 
     pprint(clr(exp_index)+"-"*27
@@ -366,6 +387,8 @@ def run(
            +"-"*27+clr()) #coloured dividing bar before simulation run
 
     #|____________________________(preprocessing)_____________________________|#
+    save_data = {} #data to be serialised and saved
+    save_data['id'] = exp_index
     if dynamic_meas:
         return_flux = True 
     # input signal
@@ -380,6 +403,7 @@ def run(
         _, org_mu, org_sigma = standardise(original_signal_data, return_mu_sigma=True)
         input_signal = standardise(signal_data, org_mu, org_sigma, False)
         num_signals = 3
+        save_data['ic_id']=signal_ic_id 
     if teacher_signal is None:
         teacher_signal=input_signal
     if not isinstance(input_signal, np.ndarray):
@@ -390,7 +414,7 @@ def run(
         input_signal = np.atleast_2d(input_signal).T 
     if len(teacher_signal.shape)==1:
         teacher_signal =  np.atleast_2d(teacher_signal).T
-    save_data = {} #data to be serialised and saved
+
     train_dur = t_train - t_warmup 
     pred_dur  = t_pred  - t_train
 
@@ -421,6 +445,7 @@ def run(
         resin[:t_train],return_flux,nwn)
     if return_flux:
         output_signal,fluxes = returned_vals
+        save_data['flux'] = fluxes
     else:
         output_signal = returned_vals
     readout_signal = output_signal[:,readout_electrodes]
@@ -478,7 +503,7 @@ def run(
             divcount[1]+=np.logical_or(Adivcount==2,Adivcount==-2).astype(np.int16)
             divcount[2]+=np.logical_or(Adivcount==3,Adivcount==-3).astype(np.int16)
             last_Adiv = Adiv
-        save_data['divcounts'] = divcount
+        save_data['dynam'] = divcount
 
     #|____________________________(nonlin measure)____________________________|#
     if nonlin_meas: 
