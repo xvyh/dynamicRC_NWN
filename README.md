@@ -1,5 +1,5 @@
-# Dynamic Reservoir Computing via Neurmorphic Nanowire Networks
-This repository include all code needed to simulate the neuromorphic nanowire network, as well as using it for time series forecasting, for the manuscripts "[Learning Chaotic Dynamics with Neuromorphic Network Dynamics](https://arxiv.org/abs/2506.10773)", and "[Dynamic Reservoir Computing with Physical Neuromorphic Networks](https://arxiv.org/abs/2505.16813)".
+# Dynamic Reservoir Computing via Neuromorphic Nanowire Networks
+This repository include all code needed to simulate the neuromorphic nanowire network, and using it for time series forecasting via reservoir computing, for the manuscripts "*Learning Chaotic Dynamics with Neuromorphic Network Dynamics*" (https://arxiv.org/abs/2506.10773)", and "*Dynamic Reservoir Computing with Physical Neuromorphic Networks*" (https://arxiv.org/abs/2505.16813).
 
 ## Requirements
 Python 3.8.2+ is needed. 
@@ -37,7 +37,7 @@ Then specify the list of electrode indices, array of input signals, timestep siz
 r = neuro_sim(nwn, electrode_indices, input_signal, dt, steps=input_signal.shape[0])
 ``` 
 
-Use [`neuropred.py`](neuropred.py) for autonomous time series prediction. An example run would look like the following (same as example in [`example_usage.py`](example_usage.py))
+Use [`neuropred.py`](neuropred.py) for autonomous time series prediction via reservoir computing. An example run would look like the following (same as example in [`example_usage.py`](example_usage.py))
 ```python
 sdata = run(
         input_signal    = 0,
@@ -89,7 +89,7 @@ Slight differences in any of the above will lead to different numerical results 
 
 The available code were made for usage with Python 3.8.2.
 
-The Intel Xeon E5-2470 v2 CPU was used for the simulations conducted for this paper, provided by the Artemis high performance computing resource at the Sydney Informatics Hub, University of Sydney.
+The Intel Xeon E5-2470 v2 CPU was used for the simulations conducted for this paper, provided by the Artemis high performance computing resource at the [Sydney Informatics Hub](https://www.sydney.edu.au/research/facilities/sydney-informatics-hub/digital-research-infrastructure.html), University of Sydney.
 
 Three CPUs were used for multiprocessing for all simulations. 
 For the 2000 node network, 80GB of RAM is needed for reproducibility (while saving all simulation outputs, hence the large RAM usage; only 2GB is needed for standard usage).
