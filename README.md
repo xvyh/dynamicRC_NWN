@@ -2,11 +2,11 @@
 This repository include all code needed to simulate the neuromorphic nanowire network, and using it for time series forecasting via reservoir computing, for the manuscripts "*Learning Chaotic Dynamics with Neuromorphic Network Dynamics*" (https://arxiv.org/abs/2506.10773)", and "*Dynamic Reservoir Computing with Physical Neuromorphic Networks*" (https://arxiv.org/abs/2505.16813).
 
 ## Requirements
-Python 3.8.2+ is needed. 
+Python 3.8.2 is needed. 
 All required external Python packages are in [`requirements.txt`](requirements.txt). 
 
 Only NumPy is strictly needed for simulations. 
-Matplotlib is only for figure making, and tqdm is a quality-of-life addition which can easily ignored by overwriting the progress bar object with an identity map (i.e. `pbar = lambda *args, **kwargs: args[0]`). 
+Matplotlib is only for figure making, and tqdm is a quality-of-life addition which can be easily ignored by overwriting the progress bar object with an identity map (i.e. `pbar = lambda *args, **kwargs: args[0]`). 
 
 ## Navigation
 [`neurowiresim.py`](neurowiresim.py): Simulation of the neuromorphic nanowire network.
@@ -87,10 +87,9 @@ Chaotic time series are very sensitive to initial conditions.
 Hence to preserve reproducibility of results, the hardware, software, number of CPUs and RAM usage must all be kept the same. 
 Slight differences in any of the above will lead to different numerical results from those in the manuscript, but the statistics and overall conclusions will remain the same. 
 
-The available code were made for usage with Python 3.8.2.
-
 The Intel Xeon E5-2470 v2 CPU was used for the simulations conducted for this paper, provided by the Artemis high performance computing resource at the [Sydney Informatics Hub](https://www.sydney.edu.au/research/facilities/sydney-informatics-hub/digital-research-infrastructure.html), University of Sydney.
 
+The available code were made for usage with Python 3.8.2.
 Three CPUs were used for multiprocessing for all simulations. 
 For the 2000 node network, 80GB of RAM is needed for reproducibility (while saving all simulation outputs, hence the large RAM usage; only 2GB is needed for standard usage).
 For the 500 node network, 20GB of RAM is needed for reproducibility (only 1GB needed for standard usage).
