@@ -37,6 +37,7 @@ class NanowireNetwork:
         self.edgelist   = np.argwhere(np.triu(self.adjmtx))
         self.flux       = np.zeros(self.edgenum) #Assuming 0 flux initialisation
         self.conductance= np.zeros(self.edgenum) #Thus 0 cond initialisation
+        self.edge_voltages  = np.zeros(self.edgenum)
 
     def update_conductance(self):
         """
@@ -107,7 +108,6 @@ def neuro_sim(
     n = nwn.nodenum
     m = len(electrodes)
     node_voltages = np.zeros((steps, n))
-    edge_voltages = np.zeros(nwn.edgenum)
     if return_flux:
         edge_fluxes = np.zeros((steps, nwn.edgenum))
     update_signal = sig_augment is not None
@@ -123,8 +123,8 @@ def neuro_sim(
         nwn.update_conductance()
         vs = get_node_voltages(
             nwn=nwn, signal=electrode_signals[t,:])
-        edge_voltages = vs[nwn.edgelist[:,0]] - vs[nwn.edgelist[:,1]]
-        nwn.update_flux(edge_voltages=edge_voltages, dt=dt)
+        nwn.edge_voltages = vs[nwn.edgelist[:,0]] - vs[nwn.edgelist[:,1]]
+        nwn.update_flux(edge_voltages=nwn.edge_voltages, dt=dt)
         node_voltages[t,:] = vs
         if return_flux:
             edge_fluxes[t,:] = nwn.flux
